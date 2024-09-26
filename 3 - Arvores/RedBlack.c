@@ -83,11 +83,11 @@ void corrigirViolacao(No **raiz, No *z)
                     z = z->pai;
                     rotacaoEsquerda(raiz, z);
                 }
-                z->pai->cor = PRETO;
+                z->pai->cor = PRETO; // POSSIVEL ERRO NO CODIGO : Mudança de cor errada, mas acaba sendo corrigida na repetição do loop
                 z->pai->pai->cor = VERMELHO;
                 rotacaoDireita(raiz, z->pai->pai);
             }
-        }
+}   
         else
         {
             No *y = z->pai->pai->esquerda;
@@ -105,7 +105,7 @@ void corrigirViolacao(No **raiz, No *z)
                     z = z->pai;
                     rotacaoDireita(raiz, z);
                 }
-                z->pai->cor = PRETO;
+                z->pai->cor = PRETO; // POSSIVEL ERRO NO CODIGO : Mudança de cor errada, mas acaba sendo corrigida na repetição do loop
                 z->pai->pai->cor = VERMELHO;
                 rotacaoEsquerda(raiz, z->pai->pai);
             }
