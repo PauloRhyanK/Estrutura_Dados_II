@@ -222,20 +222,21 @@ void imprimeArvoreRB(struct NoRb *raiz, int b)
     }
 }
 
-int main() {
-    struct NoRb *raiz = NULL;
-    int vetor[] = {12, 31, 20, 17, 11, 8, 3, 24, 15, 33};""
+int main()
+{
+    struct No *raiz = NULL;
+    // Exemplo de inserção de valores na árvore Red-Black
+    int vetor[] = {12, 31, 20, 17, 11, 8, 3, 24, 15, 33};
     int i, tam = sizeof(vetor) / sizeof(vetor[0]);
     for (i = 0; i < tam; i++)
-        inserirNo(&raiz, vetor[i]);
-    
-    printf("Árvore Red-Black em ordem:\n");
-    emOrdem(raiz);
-    printf("\nÁrvore Red-Black (formato visual):\n");
-    imprimeArvoreRB(raiz, 0);
-    
+        inserir(&raiz, vetor[i]);
+    printf("Árvore Red-Black: \n");
+    imprimeArvoreRB(raiz, 3);
+    printf("\n");
+
     return 0;
 }
+
 
 
 
