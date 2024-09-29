@@ -2,24 +2,31 @@
 #include <stdlib.h>
 
 /**
- * Paulo Rhyan Kuster - CC6N
- *
- * CODIGO QUE NÃO FUNCIONA
+Paulo Rhyan Kuster - CC6N
+
+"A terceira atividade do diário de bordo chegou! Nesta etapa, vocês vão implementar, em Linguagem C, a estrutura de uma Árvore Red-Black."
+
+Estrutura:
+• Criação de No;
+• Balanceamento;
+• Inserção de um elemento na árvore;
+• Exclusão de um elemento na árvore;
+
  **/
 
 struct NoRb {
-    int dado;                // Valor armazenado no nó
-    struct NoRb *esq;       // Ponteiro para o filho à esquerda
-    struct NoRb *dir;       // Ponteiro para o filho à direita
-    struct NoRb *pai;       // Ponteiro para o pai
-    int cor;                // Cor do nó (0 = vermelho, 1 = preto)
+    int dado;
+    struct NoRb *esq;
+    struct NoRb *dir;
+    struct NoRb *pai;
+    int cor;
 };
-
 typedef struct NoRb NoRb;
 
-// Criando Nó
+// Criando No
 struct NoRb *criarNo(int valor) {
-    struct NoRb *novoNo = (struct NoRb*)malloc(sizeof(struct NoRb));
+    struct NoRb *novoNo = (struct NoRb *)malloc(sizeof(struct NoRb));
+
     novoNo->dado = valor;
     novoNo->esq = NULL;
     novoNo->dir = NULL;
@@ -31,18 +38,18 @@ struct NoRb *criarNo(int valor) {
 void rotacaoesq(struct NoRb **root, struct NoRb *a) {
     struct NoRb *b = a->dir;
 
-    // Passando filho do B para o A
+    // Passando filho do B, para o A
     a->dir = b->esq;
-    if (b->esq != NULL) {
+    if (b->esq != NULL) { // Corrigido para verificar se b->esq não é NULL
         b->esq->pai = a;
     }
 
-    // Passando pai do A para o B
+    // Passando Pai do A para o B
     b->pai = a->pai;
 
-    // Verificando se o B era um filho direito ou esquerdo, para alterar o nó pai adequadamente ou setar a nova raiz
+    // Verificando se o B era um filho dir ou esq, para alterar o NO pai adequadamente ou setar a nova RAIZ
     if (a->pai == NULL) {
-        *root = b;  // B se torna a nova raiz
+        *root = b;
     } else if (a == a->pai->esq) {
         a->pai->esq = b;
     } else {
@@ -57,18 +64,18 @@ void rotacaoesq(struct NoRb **root, struct NoRb *a) {
 void rotacaodir(struct NoRb **root, struct NoRb *a) {
     struct NoRb *b = a->esq;
 
-    // Passando filho do B para o A
+    // Passando filho do B, para o A
     a->esq = b->dir;
     if (b->dir != NULL) {
         b->dir->pai = a;
     }
 
-    // Passando pai do A para o B
-    b->pai = a->pai;
+    // Passando Pai do A para o B
+    a->pai = b->pai;
 
-    // Verificando se o B era um filho direito ou esquerdo, para alterar o nó pai adequadamente ou setar a nova raiz
+    // Verificando se o B era um filho dir ou esq, para alterar o NO pai adequadamente ou setar a nova RAIZ
     if (a->pai == NULL) {
-        *root = b;  // B se torna a nova raiz
+        *root = b;
     } else if (a == a->pai->dir) {
         a->pai->dir = b;
     } else {
@@ -77,83 +84,87 @@ void rotacaodir(struct NoRb **root, struct NoRb *a) {
 
     // Finalizando a rotação
     b->dir = a;
+
+    // Alterando Pai
     a->pai = b;
 }
 
 void balancear(struct NoRb **raiz, struct NoRb *node) {
     while (node != *raiz && node->pai != NULL && node->pai->cor == 0) {
-        // Verificando se o nó pai é o filho à esquerda ou à direita
+        // Verificando se o no pai e o filho da esquerda ou direita
         if (node->pai == node->pai->pai->esq) {
             struct NoRb *x = node->pai->pai->dir;
 
-            // Verificando se o nó avô tem um filho direito
+            // Verificando se o No avo tem um filho direito
             if (x != NULL && x->cor == 0) {
                 x->cor = 1;
                 node->pai->pai->cor = 0;
                 node->pai->cor = 1;
-                node = node->pai->pai; // Subindo na árvore
+
+                node = node->pai->pai;
             } else {
                 if (node == node->pai->dir) {
                     node = node->pai;
-                    rotacaoesq(raiz, node); // Rotação esquerda
+                    rotacaoesq(raiz, node);
                 }
                 node->pai->cor = 1;
                 node->pai->pai->cor = 0;
-                rotacaodir(raiz, node->pai->pai); // Rotação direita
+                rotacaodir(raiz, node->pai->pai);
             }
         } else {
-            // Verificando se o nó avô tem um filho esquerdo
+            // Verificando se o No avo tem um filho esquerdo
             struct NoRb *x = node->pai->pai->esq;
             if (x != NULL && x->cor == 0) {
                 x->cor = 1;
                 node->pai->pai->cor = 0;
                 node->pai->cor = 1;
-                node = node->pai->pai; // Subindo na árvore
+
+                node = x;
             } else {
                 if (node == node->pai->esq) {
                     node = node->pai;
-                    rotacaodir(raiz, node); // Rotação direita
+                    rotacaodir(raiz, node);
                 }
                 node->pai->cor = 1;
                 node->pai->pai->cor = 0;
-                rotacaoesq(raiz, node->pai->pai); // Rotação esquerda
+                rotacaoesq(raiz, node->pai->pai);
             }
         }
     }
-    (*raiz)->cor = 1; // A raiz é sempre preta
+    (*raiz)->cor = 1;
 }
 
 void inserirNo(struct NoRb **root, int valor) {
-    struct NoRb *novoNo = criarNo(valor); // Cria um novo nó com o valor inserido
-    struct NoRb *paiX = NULL; // Armazena o pai
-    struct NoRb *x = *root; // Variável para percorrer a árvore
+    struct NoRb *novoNo = criarNo(valor); // cria um novo No com o valor inserido
+    struct NoRb *paiX = NULL; // Valor para armazenar o pai
+    struct NoRb *x = *root; // Variavel para percorrer arvore
 
     while (x != NULL) {
-        paiX = x; // Armazena o pai do nó atual
+        paiX = x; //  Armazena o pai do No atual
 
-        // Percorrendo a árvore até achar o lugar certo para o novo nó
+        // Percorrendo arvore até achar o lugar certo para o novo No
         if (novoNo->dado < x->dado) {
             x = x->esq;
         } else if (novoNo->dado > x->dado) {
             x = x->dir;
         } else {
-            free(novoNo); // Se o valor já existir, não insere
+            free(novoNo);
             return;
         }
     }
-    // Insere o novo pai do nó
+    //  Insere o novo pai do No
     novoNo->pai = paiX;
 
-    // Inserindo novo nó
+    // Inserindo Novo No
     if (paiX == NULL) {
-        *root = novoNo; // A árvore estava vazia
+        *root = novoNo;
     } else if (novoNo->dado < paiX->dado) {
         paiX->esq = novoNo;
     } else {
         paiX->dir = novoNo;
     }
 
-    // Balanceando a árvore
+    // Balanceando Arvore
     balancear(root, novoNo);
 }
 
@@ -182,7 +193,7 @@ void imprimeArvoreRB(struct NoRb *raiz, int espacos) {
 // Função principal
 int main() {
     struct NoRb *raiz = NULL;
-
+    
     // Exemplo de inserção de valores na árvore Red-Black
     int vetor[] = {12, 31, 20, 17, 11, 8, 3, 24, 15, 33};
     int tam = sizeof(vetor) / sizeof(vetor[0]);
