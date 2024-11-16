@@ -221,36 +221,64 @@ struct NoAVL *excluir(struct NoAVL *raiz, int valor) {
     else // Se o nó atual for igual ao valor a ser excluído
     {
         // Caso 1: Nó folha ou nó com apenas um filho
-        if (raiz->esquerda == NULL) // Se tiver apenas filhos à direita
-        {
-            struct NoAVL *temp = raiz->direita; // Define qual nó filho irá substituir o pai, nesse caso, o nó à direita.
-            free(raiz);                         // Libera o valor do nó da memória
-            return temp;                        // Retorna o nó que irá substituir o nó pai
-        }
-        else if (raiz->direita == NULL) // Se tiver apenas filhos à esquerda
-        {
-            struct NoAVL *temp = raiz->esquerda; // Define qual nó filho irá substituir o pai, nesse caso, o nó à esquerda.
-            free(raiz);                         // Libera o valor do nó da memória
-            return temp;                        // Retorna o nó que irá substituir o nó pai
-        }
+        if (raiz->esquerda == NULL || raiz->direita == NULL) {
+            struct NoAVL *temp;
+            if (raiz->esquerda != NULL) {
+            temp = raiz->esquerda;
+            } else {
+            temp = raiz->direita;   }
 
-        // Caso 2: Nó com dois filhos
-        // Verifica o balanceamento antes de decidir entre o valor maior à direita da subárvore esquerda ou o menor valor à esquerda da subárvore direita
-        if (altura(raiz->esquerda) >= altura(raiz->direita)) {
-            // Se a altura da subárvore esquerda for maior, escolhe o maior valor à direita da subárvore esquerda
-            struct NoAVL *temp = encontrarMaximo(raiz->esquerda); // Encontra o maior valor na subárvore esquerda
-            raiz->dado = temp->dado;                              // Copia o valor do sucessor in-order (maior valor na subárvore esquerda) para a raiz atual
-            raiz->esquerda = excluir(raiz->esquerda, temp->dado); // Remove o nó com o valor copiado da subárvore esquerda
-        } else {
-            // Caso contrário, escolhe o menor valor à esquerda da subárvore direita
+
+            // Caso de nó folha
+            if (temp == NULL) {
+                temp = raiz;
+                raiz = NULL;
+            } else {
+                // Nó com um filho
+                *raiz = *temp; // Copia o conteúdo do nó filho para o nó atual
+            }
+            free(temp);
+        }
+        else // Caso 2: Nó com dois filhos
+        {
             struct NoAVL *temp = encontrarMinimo(raiz->direita); // Encontra o menor valor na subárvore direita
-            raiz->dado = temp->dado;                              // Copia o valor do sucessor in-order (menor valor na subárvore direita) para a raiz atual
-            raiz->direita = excluir(raiz->direita, temp->dado);   // Remove o nó com o valor copiado da subárvore direita
+            raiz->dado = temp->dado; // Substitui o valor atual pelo menor valor encontrado
+            raiz->direita = excluir(raiz->direita, temp->dado); // Remove o nó que tinha o menor valor
         }
     }
 
-    // Após a exclusão, chama a função de balanceamento para garantir que a árvore permaneça balanceada
-    return balanceamento(raiz, valor);
+    // Se a raiz for nula após a remoção
+    if (raiz == NULL) {
+        return raiz;
+    }
+
+    // Atualiza a altura da raiz atual
+    raiz->altura = 1 + (altura(raiz->esquerda) > altura(raiz->direita) ? altura(raiz->esquerda) : altura(raiz->direita));
+
+    // Verifica o fator de balanceamento deste nó
+    int balanceamento = fatorBalanceamento(raiz);
+
+    // Caso de desbalanceamento à esquerda-esquerda
+    if (balanceamento > 1 && fatorBalanceamento(raiz->esquerda) >= 0)
+        return rotacaoDireita(raiz);
+
+    // Caso de desbalanceamento à esquerda-direita
+    if (balanceamento > 1 && fatorBalanceamento(raiz->esquerda) < 0) {
+        raiz->esquerda = rotacaoEsquerda(raiz->esquerda);
+        return rotacaoDireita(raiz);
+    }
+
+    // Caso de desbalanceamento à direita-direita
+    if (balanceamento < -1 && fatorBalanceamento(raiz->direita) <= 0)
+        return rotacaoEsquerda(raiz);
+
+    // Caso de desbalanceamento à direita-esquerda
+    if (balanceamento < -1 && fatorBalanceamento(raiz->direita) > 0) {
+        raiz->direita = rotacaoDireita(raiz->direita);
+        return rotacaoEsquerda(raiz);
+    }
+
+    return raiz; // Retorna a raiz após o balanceamento
 }
 
 
@@ -292,7 +320,7 @@ void imprimeNo(int c, int b)
 {
     int i;
     for (i = 0; i < b; i++) // Loop para imprimir espaços proporcionais à profundidade
-        printf("   ");
+        printf("        ");
     printf("%i\n", c); // Imprime o valor do nó com a devida indentação
 }
 
@@ -366,60 +394,16 @@ int main()
 {
 
     struct NoAVL *raiz = NULL;
-    //Inserindo elementos na árvore AVL
-    raiz = inserir(raiz, 30);
-    raiz = inserir(raiz, 24);
-    raiz = inserir(raiz, 20);
-    raiz = inserir(raiz, 35);
-    raiz = inserir(raiz, 27);
-    raiz = inserir(raiz, 33);
-    raiz = inserir(raiz, 38);
-    raiz = inserir(raiz, 25);
-    raiz = inserir(raiz, 22);
-    raiz = inserir(raiz, 34);
-    raiz = inserir(raiz, 40);
-    raiz = inserir(raiz, 29);
-    mostraArvore(raiz, 3);
-   
-    printf("\nLetra A - Insere 31 ---------------------------\n");
-    raiz = inserir(raiz, 31);
-    mostraArvore(raiz, 3);
-   
-    printf("\nLetra B - Insere 15 ---------------------------\n");
-    raiz = inserir(raiz, 15);
-    mostraArvore(raiz, 3);
-   
-    printf("\nLetra C - Insere 23 ----------------------------\n");
-    raiz = inserir(raiz, 23);
-    mostraArvore(raiz, 3);
-   
-    printf("\nLetra D - Exclui 24 ---------------------------\n");
-    raiz = excluir(raiz, 24);
-    mostraArvore(raiz, 3);
-   
-    printf("\nLetra E - Exclui 35 ---------------------------\n");
-    raiz = excluir(raiz, 35);
-    mostraArvore(raiz, 3);
-
-     printf("\nLetra F - Inserir 24 ---------------------------\n");
-    raiz = inserir(raiz, 24);
-    mostraArvore(raiz, 3);
-
-     printf("\nLetra G - Exclui 27 ---------------------------\n");
-    raiz = excluir(raiz, 27);
-    mostraArvore(raiz, 3);
-
-     printf("\nLetra H - Inserir 32 ---------------------------\n");
-    raiz = inserir(raiz, 32);
-    mostraArvore(raiz, 3);
-
-     printf("\nLetra I - Exclui 30 ---------------------------\n");
-    raiz = excluir(raiz, 30);
-    mostraArvore(raiz, 3);
-    
-    printf("\nLetra J - Inserir 21 ---------------------------\n");
-    raiz = inserir(raiz, 21);
-    mostraArvore(raiz, 3);
+    //Inserindo elementos na árvore 
+    int avl[21] = {50,1,64,12,18,66,38,95,58,59,70,68,39,62,7,60,43,16,67,34,35};
+    int remove[5] = {50,95,70,60,35};
+    for(int i = 0; i<(sizeof(avl)/sizeof(int)); i++){
+    raiz = inserir(raiz,avl[i]);
+    }
+    for(int i = 0; i<(sizeof(remove)/sizeof(int)); i++){
+    raiz = excluir(raiz,remove[i]);
+    }
+    mostraArvore(raiz,3);
 
     return 0;
 }

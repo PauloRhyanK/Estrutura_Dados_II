@@ -164,7 +164,7 @@ void imprimeArvoreRB(No *raiz, int b)
 
         // Imprime o valor do nó atual com um espaçamento proporcional à sua profundidade
         for (int i = 0; i < b; i++)
-            printf("       "); // espaços por nível
+            printf("    "); // espaços por nível
         if (raiz->cor == 0)
             printf("\033[31m%d\033[0m\n\n", raiz->valor);
         else
@@ -179,10 +179,12 @@ int main()
 {
     struct No *raiz = NULL;
     // Exemplo de inserção de valores na árvore Red-Black
-    int vetor[] = {12, 31, 20, 17, 11, 8, 3, 24, 15, 33};
+    int vetor[] = {1,2,3,4,5,6,7,8,9,10};
     int i, tam = sizeof(vetor) / sizeof(vetor[0]);
-    for (i = 0; i < tam; i++)
+    for (i = 0; i < tam; i++){
         inserir(&raiz, vetor[i]);
+        printf("\n--------------- INSERINDO O VALOR %d NA ÁRVORE... ---------------\n",vetor[i]);
+        imprimeArvoreRB(raiz, 3);}
     printf("Árvore Red-Black: \n");
     imprimeArvoreRB(raiz, 3);
     printf("\n");
