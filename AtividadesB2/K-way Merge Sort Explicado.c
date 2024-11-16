@@ -89,8 +89,8 @@ void kWayMerge(const char *files[], int k, const char *outputFile)
 
 int main()
 {
-    const char *inputFiles[K] = {"run1.txt", "run2.txt", "run3.txt"};
-    kWayMerge(inputFiles, K, "sorted_output.txt");
+    const char *inputFiles[3] = {"run1.txt", "run2.txt", "run3.txt"};
+    kWayMerge(inputFiles, 3, "sorted_output.txt");
     printf("Intercalação k-vias concluída!\n");
     return 0;
 }
